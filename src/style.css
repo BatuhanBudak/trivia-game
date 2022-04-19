@@ -1,0 +1,131 @@
+*{
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    background-color: #F5F7FB;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    /* padding:  2rem; */
+    background-image: url("./imgs/blob\ 5.png"), url("./imgs/blob\ 5\(1\).png");
+    background-repeat: no-repeat no-repeat;
+    background-position: top right, bottom left;
+    background-size: 297px 235px, 201px 142px;
+}
+h2{
+    margin: 0;
+}
+
+.intro{
+    display: flex;
+    flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   color: #293264
+}
+
+.intro >h1{
+    font-family: Karla;
+    font-size: 3rem;
+    line-height: 37px;
+    margin: 0;
+}
+.intro > p{
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 1.2rem;
+    margin-bottom: 2.5rem;
+    margin-top: 1rem;
+}
+.intro > button{
+    width: 25vw ;
+    height: 7vh;
+    font-family: 'Inter';
+    font-weight: 500;
+    color: #F5F7FB;
+    background: #4D5B9E;
+    border-radius: 15px;
+    line-height: 19px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+main{
+    display: flex;
+    flex-flow: column;
+    align-items: inherit;
+}
+
+.question--container{
+    margin-bottom: 1rem;
+    
+}
+
+
+.question--title{
+    font-family: 'Karla';
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 19px;
+    color: #293264;
+    margin-block: 1rem;
+}
+.question-break{
+    color: #DBDEF0;
+    transform: rotate(-0.05deg);
+}
+.answer-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap:.75rem;
+    margin-bottom: 2rem;
+}
+
+.answer{
+    border: 0.794239px solid #4D5B9E;
+    box-sizing: border-box;
+    border-radius: 7.94239px;
+    cursor: pointer;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 12px;
+    text-align: center;
+    color: #293264;
+    padding: .5rem 1.5rem;
+}
+
+.check-button, .end-game-button{
+    font-family: 'Inter';
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 12px;
+    text-align: center;
+    color: #F5F7FB;
+    background: #4D5B9E;
+    border-radius: 10px;
+    padding: 1.2rem 3rem;
+    align-self: center;
+    cursor: pointer;
+}
+
+.end-game-container{
+    margin-left: auto;
+}
+
+.end-game-info{
+    font-family: 'Inter';
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 15px;
+    text-align: center;
+    color: #293264;
+    margin-right: 2rem;
+    letter-spacing: .3em;
+}
