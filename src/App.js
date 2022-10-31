@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import Question from "./components/Question";
 import { nanoid } from "nanoid";
 
-
-
 function App() {
-
   const [gameStarted, setGameStarted] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [allSolved, setAllSolved] = useState(false);
@@ -21,10 +18,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setAllSolved(questions.every((question) =>{
-      return  question.isSolved;
-    }));
-  },[questions])
+    setAllSolved(
+      questions.every((question) => {
+        return question.isSolved;
+      })
+    );
+  }, [questions]);
 
   function createQuestions(data) {
     return data.map((item) => {
@@ -43,7 +42,7 @@ function App() {
       };
     });
   }
-  function getNewQuestions(){
+  function getNewQuestions() {
     fetch(
       "https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple"
     )
@@ -113,7 +112,7 @@ function App() {
         value: convertedAnswer,
         haveAnsweredCorrectly: "unset",
         isCorrectAnswer: item === correct_answer,
-        isHeld: false
+        isHeld: false,
       };
     });
   }
@@ -122,21 +121,17 @@ function App() {
     return arr.sort(() => Math.random() - 0.5);
   }
 
- 
-
   function checkAnswers() {
-    setIsGameEnded(true);
     setQuestions((oldQuestions) =>
       oldQuestions.map((question) => {
         const answers = question.shuffledAnswers.map((answer) => {
           if (answer.isSelected) {
             if (answer.isCorrectAnswer) {
-              setCount(count + 1);
+              setCount((count) => count + 1);
               return {
                 ...answer,
                 isHeld: true,
                 haveAnsweredCorrectly: true,
-                
               };
             } else if (!answer.isCorrectAnswer) {
               return {
@@ -148,13 +143,13 @@ function App() {
               return {
                 ...answer,
                 isHeld: true,
-              }
+              };
             }
           } else {
             return {
               ...answer,
-                isHeld: true,
-            }
+              isHeld: true,
+            };
           }
         });
         return {
@@ -163,9 +158,10 @@ function App() {
         };
       })
     );
+    setIsGameEnded(true);
   }
 
-  function startNewGame(){
+  function startNewGame() {
     setCount(0);
     setIsGameEnded(false);
     getNewQuestions();
@@ -184,18 +180,21 @@ function App() {
       {gameStarted && (
         <main>
           {questionBlock}
-          { allSolved &&
-           !isGameEnded &&(
-            <button 
-            className ="check-button"
-            onClick = {checkAnswers} >Check answers</button>
+          {allSolved && !isGameEnded && (
+            <button className="check-button" onClick={checkAnswers}>
+              Check answers
+            </button>
           )}
-          {isGameEnded &&
-          <div className="end-game-container">
-            <span className="end-game-info">You scored {count}/5 correct answers</span>
-            <button className="end-game-button" onClick={startNewGame}>Play Again</button>
-          </div>
-          }
+          {isGameEnded && (
+            <div className="end-game-container">
+              <span className="end-game-info">
+                You scored {count}/5 correct answers
+              </span>
+              <button className="end-game-button" onClick={startNewGame}>
+                Play Again
+              </button>
+            </div>
+          )}
         </main>
       )}
     </div>
