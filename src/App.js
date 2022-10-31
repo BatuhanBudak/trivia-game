@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Question from "./components/Question";
 import { nanoid } from "nanoid";
 
@@ -9,13 +9,48 @@ function App() {
   const [count, setCount] = useState(0);
   const [isGameEnded, setIsGameEnded] = useState(false);
 
+  const createAnswers = useCallback((allAnswers, correct_answer) => {
+    return allAnswers.map((item) => {
+      const convertedAnswer = convertUnicode(item);
+      return {
+        id: nanoid(),
+        isSelected: false,
+        value: convertedAnswer,
+        haveAnsweredCorrectly: "unset",
+        isCorrectAnswer: item === correct_answer,
+        isHeld: false,
+      };
+    });
+  }, []);
+
+  const createQuestions = useCallback(
+    (data) => {
+      return data.map((item) => {
+        const convertedQuestion = convertUnicode(item.question);
+        return {
+          id: nanoid(),
+          question: convertedQuestion,
+          correctAnswer: item.correct_answer,
+          shuffledAnswers: shuffleArray(
+            createAnswers(
+              [item.correct_answer, ...item.incorrect_answers],
+              item.correct_answer
+            )
+          ),
+          isSolved: false,
+        };
+      });
+    },
+    [createAnswers]
+  );
+
   useEffect(() => {
     fetch(
       "https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple"
     )
       .then((res) => res.json())
       .then((data) => setQuestions(createQuestions(data.results)));
-  }, []);
+  }, [createQuestions]);
 
   useEffect(() => {
     setAllSolved(
@@ -25,23 +60,6 @@ function App() {
     );
   }, [questions]);
 
-  function createQuestions(data) {
-    return data.map((item) => {
-      const convertedQuestion = convertUnicode(item.question);
-      return {
-        id: nanoid(),
-        question: convertedQuestion,
-        correctAnswer: item.correct_answer,
-        shuffledAnswers: shuffleArray(
-          createAnswers(
-            [item.correct_answer, ...item.incorrect_answers],
-            item.correct_answer
-          )
-        ),
-        isSolved: false,
-      };
-    });
-  }
   function getNewQuestions() {
     fetch(
       "https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple"
@@ -101,20 +119,6 @@ function App() {
         }
       })
     );
-  }
-
-  function createAnswers(allAnswers, correct_answer) {
-    return allAnswers.map((item) => {
-      const convertedAnswer = convertUnicode(item);
-      return {
-        id: nanoid(),
-        isSelected: false,
-        value: convertedAnswer,
-        haveAnsweredCorrectly: "unset",
-        isCorrectAnswer: item === correct_answer,
-        isHeld: false,
-      };
-    });
   }
 
   function shuffleArray(arr) {
