@@ -2,35 +2,68 @@ import React, { useState, useEffect, useCallback } from "react";
 import Question from "./components/Question";
 import { nanoid } from "nanoid";
 
-function App() {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [questions, setQuestions] = useState([]);
-  const [allSolved, setAllSolved] = useState(false);
-  const [count, setCount] = useState(0);
-  const [isGameEnded, setIsGameEnded] = useState(false);
+type APIResponseJSON = {
+  category: string;
+  correct_answer: string;
+  difficulty: string;
+  incorrect_answers: string[];
+  question: string;
+  type: string;
+};
+type APIResponse = {
+  responseCode: number;
+  results: APIResponseJSON[];
+};
 
-  const createAnswers = useCallback((allAnswers, correct_answer) => {
-    return allAnswers.map((item) => {
-      const convertedAnswer = convertUnicode(item);
-      return {
-        id: nanoid(),
-        isSelected: false,
-        value: convertedAnswer,
-        haveAnsweredCorrectly: "unset",
-        isCorrectAnswer: item === correct_answer,
-        isHeld: false,
-      };
-    });
-  }, []);
+export type AnswerType = {
+  id: string;
+  isSelected: boolean;
+  value: string;
+  haveAnsweredCorrectly: string | boolean;
+  isCorrectAnswer: boolean;
+  isHeld: boolean;
+};
+
+export type QuestionType = {
+  id: string;
+  isSolved: boolean;
+  correct_answer: string;
+  question: string;
+  shuffledAnswers: AnswerType[];
+};
+
+function App() {
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [questions, setQuestions] = useState([] as QuestionType[]);
+  const [allSolved, setAllSolved] = useState<boolean>(false);
+  const [count, setCount] = useState<number>(0);
+  const [isGameEnded, setIsGameEnded] = useState<boolean>(false);
+
+  const createAnswers = useCallback(
+    (allAnswers: string[], correct_answer: string): AnswerType[] => {
+      return allAnswers.map((item: string) => {
+        const convertedAnswer = convertUnicode(item);
+        return {
+          id: nanoid(),
+          isSelected: false,
+          value: convertedAnswer,
+          haveAnsweredCorrectly: "unset",
+          isCorrectAnswer: item === correct_answer,
+          isHeld: false,
+        };
+      });
+    },
+    []
+  );
 
   const createQuestions = useCallback(
-    (data) => {
+    (data: APIResponseJSON[]): QuestionType[] => {
       return data.map((item) => {
         const convertedQuestion = convertUnicode(item.question);
         return {
           id: nanoid(),
           question: convertedQuestion,
-          correctAnswer: item.correct_answer,
+          correct_answer: item.correct_answer,
           shuffledAnswers: shuffleArray(
             createAnswers(
               [item.correct_answer, ...item.incorrect_answers],
@@ -49,7 +82,7 @@ function App() {
       "https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple"
     )
       .then((res) => res.json())
-      .then((data) => setQuestions(createQuestions(data.results)));
+      .then((data: APIResponse) => setQuestions(createQuestions(data.results)));
   }, [createQuestions]);
 
   useEffect(() => {
@@ -65,10 +98,10 @@ function App() {
       "https://opentdb.com/api.php?amount=5&difficulty=medium&type=multiple"
     )
       .then((res) => res.json())
-      .then((data) => setQuestions(createQuestions(data.results)));
+      .then((data: APIResponse) => setQuestions(createQuestions(data.results)));
   }
 
-  function convertUnicode(item) {
+  function convertUnicode(item: string): string {
     return item
       .replace(/&quot;/g, '"')
       .replace(/&#039;/g, "'")
@@ -87,7 +120,7 @@ function App() {
         key={question.id}
         id={question.id}
         question={question.question}
-        correctAnswer={question.correctAnswer}
+        correct_answer={question.correct_answer}
         shuffledAnswers={question.shuffledAnswers}
         isSolved={question.isSolved}
         chooseAnswer={chooseAnswer}
@@ -95,7 +128,7 @@ function App() {
     );
   });
 
-  function chooseAnswer(questionId, answerID) {
+  function chooseAnswer(questionId: string, answerID: string) {
     setQuestions((oldQuestions) =>
       oldQuestions.map((question) => {
         if (questionId === question.id) {
@@ -121,7 +154,7 @@ function App() {
     );
   }
 
-  function shuffleArray(arr) {
+  function shuffleArray(arr: AnswerType[]) {
     return arr.sort(() => Math.random() - 0.5);
   }
 
@@ -131,7 +164,7 @@ function App() {
         const answers = question.shuffledAnswers.map((answer) => {
           if (answer.isSelected) {
             if (answer.isCorrectAnswer) {
-              setCount((count) => count + 1);
+              // setCount((count) => count + 1);
               return {
                 ...answer,
                 isHeld: true,
@@ -162,7 +195,19 @@ function App() {
         };
       })
     );
+    calculateScore();
     setIsGameEnded(true);
+  }
+
+  function calculateScore() {
+    const totalAnswers = questions.map((question) => question.shuffledAnswers);
+
+    totalAnswers.forEach((answers) => {
+      const trueAnswer = answers.filter(
+        (answer) => answer.isCorrectAnswer && answer.isSelected
+      );
+      if (trueAnswer.length > 0) setCount((count) => count + 1);
+    });
   }
 
   function startNewGame() {
